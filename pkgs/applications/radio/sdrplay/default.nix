@@ -1,4 +1,4 @@
-{ stdenv, lib, fetchurl, autoPatchelfHook, udev, libusb1 }:
+{ stdenv, lib, fetchurl, autoPatchelfHook, writeText, udev, libusb1 }:
 let
   arch =
     if stdenv.isx86_64 then "x86_64"
@@ -6,7 +6,7 @@ let
     else if stdenv.isAarch64 then "aarch64"
     else throw "unsupported architecture";
 
-  version = "3.07.1";
+  version = "3.15.2";
 
   srcs = rec {
     aarch64 = {
@@ -16,11 +16,21 @@ let
 
     x86_64 = {
       url = "https://www.sdrplay.com/software/SDRplay_RSP_API-Linux-${version}.run";
-      sha256 = "1a25c7rsdkcjxr7ffvx2lwj7fxdbslg9qhr8ghaq1r53rcrqgzmf";
+      sha256 = "sha256-OpfKdkJju+dvsPIiDmQIlCNX6IZMGeFAim1ph684L+M=";
     };
 
     i686 = x86_64;
   };
+
+  udev_rules = writeText "66-sdrplay.rules" ''
+    SUBSYSTEM=="usb",ENV{DEVTYPE}=="usb_device",ATTRS{idVendor}=="1df7",ATTRS{idProduct}=="2500",MODE:="0666"
+    SUBSYSTEM=="usb",ENV{DEVTYPE}=="usb_device",ATTRS{idVendor}=="1df7",ATTRS{idProduct}=="3000",MODE:="0666"
+    SUBSYSTEM=="usb",ENV{DEVTYPE}=="usb_device",ATTRS{idVendor}=="1df7",ATTRS{idProduct}=="3010",MODE:="0666"
+    SUBSYSTEM=="usb",ENV{DEVTYPE}=="usb_device",ATTRS{idVendor}=="1df7",ATTRS{idProduct}=="3020",MODE:="0666"
+    SUBSYSTEM=="usb",ENV{DEVTYPE}=="usb_device",ATTRS{idVendor}=="1df7",ATTRS{idProduct}=="3030",MODE:="0666"
+    SUBSYSTEM=="usb",ENV{DEVTYPE}=="usb_device",ATTRS{idVendor}=="1df7",ATTRS{idProduct}=="3050",MODE:="0666"
+    SUBSYSTEM=="usb",ENV{DEVTYPE}=="usb_device",ATTRS{idVendor}=="1df7",ATTRS{idProduct}=="3060",MODE:="0666"
+  '';
 in
 stdenv.mkDerivation rec {
   pname = "sdrplay";
@@ -50,7 +60,7 @@ stdenv.mkDerivation rec {
     ln -s "$out/lib/$libName.so.$majorVersion" "$out/lib/$libName.so"
     cp "${arch}/sdrplay_apiService" $out/bin/
     cp -r inc/* $out/include/
-    cp 66-mirics.rules $out/lib/udev/rules.d/
+    cp -r $udev_rules $out/lib/udev/rules.d/
   '';
 
   meta = with lib; {
