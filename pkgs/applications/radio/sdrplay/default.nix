@@ -50,7 +50,7 @@ stdenv.mkDerivation rec {
     ln -s "$out/lib/$libName.so.$majorVersion" "$out/lib/$libName.so"
     cp "${arch}/sdrplay_apiService" $out/bin/
     cp -r inc/* $out/include/
-    cp -r $udev_rules $out/lib/udev/rules.d/
+    ln -s $udev_rules $out/lib/udev/rules.d/66-sdrplay.rules
   '';
 
   meta = with lib; {
