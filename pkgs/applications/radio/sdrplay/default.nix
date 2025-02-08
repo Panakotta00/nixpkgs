@@ -25,7 +25,7 @@ stdenv.mkDerivation rec {
 
   src = fetchurl {
     url = "https://www.sdrplay.com/software/SDRplay_RSP_API-Linux-${version}.run";
-    sha256 = "sha256-OpfKdkJju+dvsPIiDmQIlCNX6IZMGeFAim1ph684L+M=";
+    `hash = "sha256-OpfKdkJju+dvsPIiDmQIlCNX6IZMGeFAim1ph684L+M=";
   };
 
   nativeBuildInputs = [ autoPatchelfHook ];
